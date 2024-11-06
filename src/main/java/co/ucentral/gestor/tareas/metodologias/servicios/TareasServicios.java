@@ -1,2 +1,4 @@
-package co.ucentral.gestor.tareas.metodologias.servicios;public class TareasServicios {
+package co.ucentral.gestor.tareas.metodologias.servicios;
+
+public class TareasServicios {
 }

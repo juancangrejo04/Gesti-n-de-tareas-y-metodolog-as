@@ -1,2 +1,4 @@
-package co.ucentral.gestor.tareas.metodologias.persistencia.entidades;public class Tareas {
+package co.ucentral.gestor.tareas.metodologias.persistencia.entidades;
+
+public class Tareas {
 }

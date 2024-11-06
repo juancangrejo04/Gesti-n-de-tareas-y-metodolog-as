@@ -1,2 +1,4 @@
-package co.ucentral.gestor.tareas.metodologias.persistencia.repositorios;public interface ProyectosRepositorio {
+package co.ucentral.gestor.tareas.metodologias.persistencia.repositorios;
+
+public interface ProyectosRepositorio {
 }

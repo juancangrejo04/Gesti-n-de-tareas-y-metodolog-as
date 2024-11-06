@@ -6,53 +6,84 @@
   <title>Inicio de Sesión</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Roboto', sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
       margin: 0;
-      background-color: #f4f4f9;
+      background: linear-gradient(135deg, #00c6ff, #0072ff);
     }
     .login-container {
-      background-color: #fff;
-      padding: 20px 40px;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      width: 300px;
+      background-color: #ffffff;
+      padding: 30px 50px;
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      width: 350px;
       text-align: center;
     }
     .login-container h2 {
-      margin-bottom: 20px;
+      margin-bottom: 30px;
+      font-size: 24px;
+      color: #333;
+      font-weight: 600;
     }
     .login-container input {
       width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+      padding: 12px;
+      margin: 12px 0;
+      border: 2px solid #ddd;
+      border-radius: 6px;
+      font-size: 16px;
+      box-sizing: border-box;
+      transition: border-color 0.3s ease;
+    }
+    .login-container input:focus {
+      border-color: #0072ff;
+      outline: none;
     }
     .login-container button {
       width: 100%;
-      padding: 10px;
-      background-color: #7345a0;
-      color: #fff;
+      padding: 12px;
+      background-color: #0072ff;
+      color: white;
       border: none;
-      border-radius: 4px;
+      border-radius: 6px;
       cursor: pointer;
-      font-size: 16px;
+      font-size: 18px;
+      transition: background-color 0.3s ease;
     }
     .login-container button:hover {
-      background-color: #7345a0;
+      background-color: #005bb5;
     }
     .error-message {
-      color: red;
+      color: #e74c3c;
       font-size: 14px;
       margin-top: 10px;
     }
     .register-link {
-      margin-top: 15px;
+      margin-top: 20px;
       font-size: 14px;
+    }
+    .register-link a {
+      color: #0072ff;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .register-link a:hover {
+      text-decoration: underline;
+    }
+    .forgot-password-link {
+      margin-top: 10px;
+      font-size: 14px;
+    }
+    .forgot-password-link a {
+      color: #0072ff;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .forgot-password-link a:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
@@ -68,9 +99,17 @@
 
   <!-- Mensaje de error (muestra un mensaje si hay error) -->
   <div class="error-message">
+    <!-- Aquí puedes agregar el mensaje de error si es necesario -->
   </div>
 
+  <div class="register-link">
+    <p>¿No tienes una cuenta? <a href="/registro">Regístrate aquí</a></p>
+  </div>
 
+  <!-- Opción de restablecer contraseña -->
+  <div class="forgot-password-link">
+    <p><a href="/restablecer-contraseña">¿Olvidaste tu contraseña?</a></p>
+  </div>
 </div>
 
 </body>
