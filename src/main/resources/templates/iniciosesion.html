@@ -5,113 +5,166 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Inicio de Sesión</title>
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Arial', sans-serif;
+    }
+
     body {
-      font-family: 'Roboto', sans-serif;
+      min-height: 100vh;
+      background: #f0f2f5;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      margin: 0;
-      background: linear-gradient(135deg, #00c6ff, #0072ff);
     }
-    .login-container {
-      background-color: #ffffff;
-      padding: 30px 50px;
-      border-radius: 12px;
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-      width: 350px;
+
+    .auth-container {
+      background: white;
+      width: 400px;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .auth-header {
       text-align: center;
-    }
-    .login-container h2 {
       margin-bottom: 30px;
+    }
+
+    .auth-header h1 {
+      color: #2c3e50;
       font-size: 24px;
-      color: #333;
-      font-weight: 600;
+      margin-bottom: 10px;
     }
-    .login-container input {
+
+    .auth-header p {
+      color: #7f8c8d;
+      font-size: 14px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .form-group label {
+      display: block;
+      color: #34495e;
+      margin-bottom: 8px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .form-control {
       width: 100%;
-      padding: 12px;
-      margin: 12px 0;
-      border: 2px solid #ddd;
+      padding: 12px 15px;
+      border: 1px solid #bdc3c7;
       border-radius: 6px;
-      font-size: 16px;
-      box-sizing: border-box;
-      transition: border-color 0.3s ease;
+      font-size: 14px;
+      transition: all 0.3s ease;
     }
-    .login-container input:focus {
-      border-color: #0072ff;
+
+    .form-control:focus {
       outline: none;
+      border-color: #3498db;
+      box-shadow: 0 0 0 2px rgba(52,152,219,0.2);
     }
-    .login-container button {
+
+    .btn {
       width: 100%;
-      padding: 12px;
-      background-color: #0072ff;
-      color: white;
+      padding: 12px 20px;
       border: none;
       border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
       cursor: pointer;
-      font-size: 18px;
-      transition: background-color 0.3s ease;
-    }
-    .login-container button:hover {
-      background-color: #005bb5;
-    }
-    .error-message {
-      color: #e74c3c;
-      font-size: 14px;
+      transition: all 0.3s ease;
       margin-top: 10px;
     }
-    .register-link {
+
+    .btn-primary {
+      background: #2c3e50;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #34495e;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .auth-footer {
+      text-align: center;
       margin-top: 20px;
-      font-size: 14px;
+      padding-top: 20px;
+      border-top: 1px solid #ecf0f1;
     }
-    .register-link a {
-      color: #0072ff;
-      text-decoration: none;
-      font-weight: 500;
-    }
-    .register-link a:hover {
-      text-decoration: underline;
-    }
-    .forgot-password-link {
+
+    .auth-links {
+      display: flex;
+      justify-content: space-between;
       margin-top: 10px;
-      font-size: 14px;
     }
-    .forgot-password-link a {
-      color: #0072ff;
+
+    .auth-links a {
+      color: #3498db;
       text-decoration: none;
-      font-weight: 500;
+      font-size: 14px;
+      transition: color 0.3s ease;
     }
-    .forgot-password-link a:hover {
+
+    .auth-links a:hover {
+      color: #2980b9;
       text-decoration: underline;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 10px;
+      top: 38px;
+      cursor: pointer;
+      color: #7f8c8d;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    .shake {
+      animation: shake 0.5s ease-in-out;
     }
   </style>
 </head>
 <body>
+<div class="auth-container">
+  <div class="auth-header">
+    <h1>Inicio de Sesión</h1>
+    <p>Ingresa tus credenciales para continuar</p>
+  </div>
 
-<div class="login-container">
-  <h2>Inicio de Sesión</h2>
-  <form action="/login" method="post">
-    <input type="text" id="username" name="username" placeholder="Nombre de usuario" required>
-    <input type="password" id="password" name="password" placeholder="Contraseña" required>
-    <button type="submit">Iniciar Sesión</button>
+  <form id="loginForm" onsubmit="return false;">
+    <div class="form-group">
+      <label for="username">Nombre de usuario</label>
+      <input type="text" class="form-control" id="username" name="username" required>
+    </div>
+
+    <div class="form-group">
+      <label for="password">Contraseña</label>
+      <input type="password" class="form-control" id="password" name="password" required>
+      <span class="password-toggle" onclick="togglePassword()">👁️</span>
+    </div>
+
+    <button type="submit" class="btn btn-primary" onclick="handleLogin()">Iniciar Sesión</button>
+
+    <div class="auth-links">
+      <a href="registro.html">¿No tienes cuenta? Regístrate</a>
+      <a href="recuperar-password.html">¿Olvidaste tu contraseña?</a>
+    </div>
   </form>
-
-  <!-- Mensaje de error (muestra un mensaje si hay error) -->
-  <div class="error-message">
-    <!-- Aquí puedes agregar el mensaje de error si es necesario -->
-  </div>
-
-  <div class="register-link">
-    <p>¿No tienes una cuenta? <a href="/registro">Regístrate aquí</a></p>
-  </div>
-
-  <!-- Opción de restablecer contraseña -->
-  <div class="forgot-password-link">
-    <p><a href="/restablecer-contraseña">¿Olvidaste tu contraseña?</a></p>
-  </div>
 </div>
-
 </body>
 </html>
-

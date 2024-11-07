@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menú de Operaciones</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #f0f2f5;
+        }
+
+        .menu {
+            width: 250px;
+            background: #2c3e50;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            color: white;
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            text-align: center;
+            padding: 0 20px 20px;
+            border-bottom: 1px solid #34495e;
+            margin-bottom: 20px;
+        }
+
+        .logo h1 {
+            font-size: 18px;
+            color: #ecf0f1;
+        }
+
+        .menu-items {
+            list-style: none;
+            flex: 1;
+        }
+
+        .menu-items li {
+            margin-bottom: 5px;
+        }
+
+        .menu-items a {
+            color: #bdc3c7;
+            text-decoration: none;
+            padding: 12px 25px;
+            display: block;
+            transition: 0.3s;
+            font-size: 14px;
+        }
+
+        .menu-items a:hover {
+            background: #34495e;
+            color: white;
+            padding-left: 30px;
+        }
+
+        .menu-items .separator {
+            height: 1px;
+            background: #34495e;
+            margin: 15px 0;
+        }
+
+        .menu-title {
+            padding: 0 25px;
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #7f8c8d;
+            margin: 10px 0 5px;
+        }
+
+        .menu-items a i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .user-section {
+            padding: 20px;
+            border-top: 1px solid #34495e;
+            text-align: center;
+        }
+
+        .welcome-text {
+            color: #bdc3c7;
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+
+        .username {
+            color: #3498db;
+            font-weight: bold;
+        }
+
+        .logout-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .logout-btn:hover {
+            background: #c0392b;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        @media (max-width: 768px) {
+            .menu {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+        }
+    </style>
+</head>
+<body>
+<nav class="menu">
+    <div class="logo">
+        <h1>MENÚ DE OPERACIONES</h1>
+    </div>
+    <ul class="menu-items">
+        <li class="menu-title">Proyectos</li>
+        <li><a href="#"><i>📁</i>Crear Proyecto</a></li>
+        <li><a href="#"><i>🔗</i>Unirse a Proyecto</a></li>
+        <li><a href="#"><i>📋</i>Listar Proyectos</a></li>
+        <li><a href="#"><i>🔄</i>Modificar Proyecto</a></li>
+        <li><a href="#"><i>📤</i>Compartir Proyecto</a></li>
+
+        <li class="separator"></li>
+
+        <li class="menu-title">Tareas</li>
+        <li><a href="#"><i>➕</i>Crear Tarea</a></li>
+        <li><a href="#"><i>📝</i>Modificar Tarea</a></li>
+        <li><a href="#"><i>❌</i>Eliminar Tarea</a></li>
+        <li><a href="#"><i>📋</i>Listar Tareas</a></li>
+        <li><a href="#"><i>🔍</i>Buscar Tareas</a></li>
+        <li><a href="#"><i>⏰</i>Tareas Pendientes</a></li>
+    </ul>
+    <div class="user-section">
+        <p class="welcome-text">Bienvenido, <span class="username">Usuario</span></p>
+        <button class="logout-btn">
+            <i>🚪</i>
+            Cerrar Sesión
+        </button>
+    </div>
+</nav>
+</body>
+</html>
