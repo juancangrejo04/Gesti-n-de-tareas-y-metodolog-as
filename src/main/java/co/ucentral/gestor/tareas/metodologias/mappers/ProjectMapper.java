@@ -3,6 +3,7 @@ package co.ucentral.gestor.tareas.metodologias.mappers;
 import co.ucentral.gestor.tareas.metodologias.dto.ProjectDTO;
 import co.ucentral.gestor.tareas.metodologias.dto.ProjectResponseDTO;
 import co.ucentral.gestor.tareas.metodologias.persistencia.entidades.Project;
+import co.ucentral.gestor.tareas.metodologias.persistencia.entidades.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

@@ -1,8 +1,11 @@
 package co.ucentral.gestor.tareas.metodologias.dto;
 
+import lombok.Data;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Data
 public class ProjectResponseDTO {
     private Long id;
     private String name;

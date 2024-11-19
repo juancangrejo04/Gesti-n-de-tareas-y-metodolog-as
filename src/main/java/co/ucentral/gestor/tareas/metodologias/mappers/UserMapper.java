@@ -2,6 +2,7 @@ package co.ucentral.gestor.tareas.metodologias.mappers;
 
 import co.ucentral.gestor.tareas.metodologias.dto.UserDTO;
 import co.ucentral.gestor.tareas.metodologias.dto.UserResponseDTO;
+import co.ucentral.gestor.tareas.metodologias.persistencia.entidades.User;
 import org.springframework.stereotype.Component;
 
 @Component

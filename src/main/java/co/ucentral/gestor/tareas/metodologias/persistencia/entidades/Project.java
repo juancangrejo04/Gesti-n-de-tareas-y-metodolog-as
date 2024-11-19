@@ -2,7 +2,6 @@ package co.ucentral.gestor.tareas.metodologias.persistencia.entidades;
 
 import jakarta.persistence.*;
 import lombok.Data;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
