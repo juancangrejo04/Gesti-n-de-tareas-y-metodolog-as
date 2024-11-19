@@ -1,4 +1,0 @@
-package co.ucentral.gestor.tareas.metodologias.controladores;
-
-public class TareasControlador {
-}
