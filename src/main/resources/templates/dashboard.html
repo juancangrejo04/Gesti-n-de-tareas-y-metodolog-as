@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Gestión de Proyectos</title>
+    <style>
+        body {
+            min-height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+        }
+
+        nav.menu {
+            width: 250px;
+            background: #2c3e50;
+            height: 100vh;
+            position: fixed;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            padding-top: 20px;
+        }
+
+        nav.menu h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #ecf0f1;
+        }
+
+        nav.menu ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        nav.menu li {
+            margin: 10px 0;
+        }
+
+        nav.menu a {
+            color: #bdc3c7;
+            text-decoration: none;
+            padding: 10px 20px;
+            display: block;
+            transition: 0.3s;
+        }
+
+        nav.menu a:hover {
+            background: #34495e;
+            color: white;
+        }
+
+        nav.menu .logout-btn {
+            margin: 20px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        main {
+            margin-left: 250px;
+            padding: 20px;
+            width: calc(100% - 250px);
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .dashboard-content {
+            margin-top: 20px;
+        }
+
+        .stats-container, .projects-section, .tasks-section {
+            margin-bottom: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .stats-container {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .stat-card {
+            flex: 1;
+            text-align: center;
+            margin: 0 10px;
+        }
+
+        .stat-card h3 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .stat-card p {
+            font-size: 24px;
+            color: #3498db;
+        }
+
+        .project-card, .task-card {
+            margin-bottom: 10px;
+            padding: 15px;
+            border: 1px solid #ecf0f1;
+            border-radius: 5px;
+        }
+
+        .project-card:hover, .task-card:hover {
+            background: #f8f9fa;
+        }
+
+        .project-title, .task-title {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<nav class="menu">
+    <h1>MENÚ</h1>
+    <ul>
+        <li><a href="#">Dashboard</a></li>
+        <li><a href="#">Proyectos</a></li>
+        <li><a href="#">Tareas</a></li>
+    </ul>
+    <button class="logout-btn" onclick="logout()">Cerrar Sesión</button>
+</nav>
+<main>
+    <div class="dashboard-header">
+        <div>
+            <h2>Bienvenido, <span id="currentUserName">Usuario</span></h2>
+            <p>Dashboard General</p>
+        </div>
+    </div>
+    <div class="dashboard-content">
+        <section class="stats-container">
+            <div class="stat-card">
+                <h3>Proyectos</h3>
+                <p id="totalProjects">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>Tareas Pendientes</h3>
+                <p id="pendingTasks">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>Tasa de Finalización</h3>
+                <p id="completionRate">0%</p>
+            </div>
+        </section>
+
+        <section class="projects-section">
+            <h3>Proyectos Pendientes</h3>
+            <div id="projectsList"></div>
+        </section>
+
+        <section class="tasks-section">
+            <h3>Tareas Pendientes</h3>
+            <div id="tasksList"></div>
+        </section>
+    </div>
+</main>
+
+<script>
+    async function fetchCurrentUser() {
+        try {
+            const response = await fetch('http://localhost:8862/api/users/me', {
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+            });
+
+            if (!response.ok) throw new Error('Error al obtener el usuario');
+
+            const user = await response.json();
+            document.getElementById('currentUserName').textContent = user.username;
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Hubo un problema al cargar los datos del usuario');
+        }
+    }
+
+    async function loadDashboardData() {
+        try {
+            const response = await fetch('http://localhost:8862/api/dashboard', {
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+            });
+
+            if (!response.ok) throw new Error('Error al cargar los datos del dashboard');
+
+            const data = await response.json();
+
+            document.getElementById('totalProjects').textContent = data.statistics.totalProjects;
+            document.getElementById('pendingTasks').textContent = data.pendingTasks.length;
+            document.getElementById('completionRate').textContent = `${data.statistics.completionRate}%`;
+
+            document.getElementById('projectsList').innerHTML = data.pendingProjects
+                .map(project => `<div class="project-card"><h4 class="project-title">${project.name}</h4><p>${project.description}</p></div>`)
+                .join('');
+
+            document.getElementById('tasksList').innerHTML = data.pendingTasks
+                .map(task => `<div class="task-card"><h4 class="task-title">${task.name}</h4><p>${task.description}</p></div>`)
+                .join('');
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Hubo un problema al cargar los datos del dashboard');
+        }
+    }
+
+    function logout() {
+        localStorage.removeItem('token');
+        window.location.href = 'login.html';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchCurrentUser();
+        loadDashboardData();
+    });
+</script>
+</body>
+</html>

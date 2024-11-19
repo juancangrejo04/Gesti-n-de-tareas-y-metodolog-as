@@ -166,5 +166,42 @@
     </div>
   </form>
 </div>
+
+<script>
+  function togglePassword() {
+    const passwordField = document.getElementById('password');
+    const passwordType = passwordField.type === 'password' ? 'text' : 'password';
+    passwordField.type = passwordType;
+  }
+
+  async function handleLogin() {
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    const loginData = { username, password };
+
+    try {
+      const response = await fetch('http://localhost:8862/api/users/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(loginData)
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem('token', data.token);
+        window.location.href = "dashboard.html";
+      } else {
+        alert('Credenciales incorrectas');
+      }
+    } catch (error) {
+      console.error('Error al hacer login:', error);
+      alert('Hubo un error al intentar iniciar sesión');
+    }
+  }
+</script>
 </body>
 </html>
