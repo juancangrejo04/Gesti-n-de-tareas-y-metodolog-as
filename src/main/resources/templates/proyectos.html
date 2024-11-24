@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Proyectos - Gestor de Tareas</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    a:hover {
+      transition: color 0.3s, transform 0.3s;
+    }
+
+    a.active {
+      color: #1d4ed8;
+      font-weight: bold;
+      border-bottom: 2px solid #1d4ed8;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      transition: transform 0.3s ease-in-out;
+    }
+
+    .card .status {
+      font-size: 0.875rem;
+    }
+
+    .modal-overlay {
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+  </style>
+</head>
+<body class="bg-gray-100">
+
+<!-- Navbar (sin cambios) -->
+<nav class="bg-white shadow-lg">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="flex justify-between h-16">
+      <div class="flex items-center space-x-8">
+        <span class="text-xl font-bold text-gray-800">Gestor de Tareas</span>
+        <div class="hidden md:flex space-x-4">
+          <a href="dashboard.html" class="text-gray-600 hover:text-blue-500 px-3 py-2 rounded-md transition duration-300 ease-in-out transform hover:scale-105 active:text-blue-700">Dashboard</a>
+          <a href="proyectos.html" class="text-gray-600 hover:text-blue-500 px-3 py-2 rounded-md transition duration-300 ease-in-out transform hover:scale-105 active:text-blue-700">Proyectos</a>
+        </div>
+      </div>
+      <div class="flex items-center space-x-4">
+        <a href="perfil.html" class="flex items-center text-gray-600 hover:text-gray-900">
+          <i class="fas fa-user-circle text-xl mr-2"></i>
+          <span id="welcomeMessage"></span>
+        </a>
+        <button onclick="logout()" class="ml-4 bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600">
+          Cerrar Sesión
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="max-w-7xl mx-auto px-4 py-6">
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Gestión de Proyectos</h1>
+  </div>
+
+  <!-- Filtros -->
+  <div class="bg-white rounded-lg shadow p-4 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="flex items-center">
+        <label class="block text-sm font-medium text-gray-700 mr-2">Estado:</label>
+        <select id="statusFilter" class="w-full border rounded-md p-2">
+          <option value="all">Todos</option>
+          <option value="active">Activos</option>
+          <option value="completed">Completados</option>
+          <option value="overdue">Atrasados</option>
+        </select>
+      </div>
+      <div class="flex items-center">
+        <label class="block text-sm font-medium text-gray-700 mr-2">Ordenar por:</label>
+        <select id="sortFilter" class="w-full border rounded-md p-2">
+          <option value="date-desc">Fecha (más reciente)</option>
+          <option value="date-asc">Fecha (más antiguo)</option>
+          <option value="name-asc">Nombre (A-Z)</option>
+          <option value="name-desc">Nombre (Z-A)</option>
+        </select>
+      </div>
+      <div class="flex items-center">
+        <label class="block text-sm font-medium text-gray-700 mr-2">Buscar:</label>
+        <input type="text" id="searchFilter" placeholder="Buscar proyectos..."
+               class="w-full border rounded-md p-2">
+      </div>
+    </div>
+  </div>
+
+  <!-- Lista de Proyectos -->
+  <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" id="projectsList">
+    <!-- Los proyectos se cargarán aquí dinámicamente -->
+  </div>
+</div>
+
+<!-- Modal para nuevo proyecto -->
+<div id="newProjectModal" class="modal fixed inset-0 hidden flex items-center justify-center modal-overlay">
+  <div class="bg-white rounded-lg w-full max-w-md mx-4">
+    <div class="p-4 border-b">
+      <h3 class="text-lg font-semibold">Nuevo Proyecto</h3>
+    </div>
+    <form id="newProjectForm" class="p-4">
+      <div class="mb-4">
+        <label class="block text-gray-700 text-sm font-bold mb-2">Nombre del Proyecto</label>
+        <input type="text" name="name" class="w-full p-2 border rounded" required>
+      </div>
+      <div class="mb-4">
+        <label class="block text-gray-700 text-sm font-bold mb-2">Descripción</label>
+        <textarea name="description" class="w-full p-2 border rounded" rows="3" required></textarea>
+      </div>
+      <div class="mb-4">
+        <label class="block text-gray-700 text-sm font-bold mb-2">Fecha de Entrega</label>
+        <input type="datetime-local" name="dueDate" class="w-full p-2 border rounded" required>
+      </div>
+      <div class="flex justify-end gap-4">
+        <button type="button" onclick="hideNewProjectModal()" class="px-4 py-2 text-gray-600 hover:text-gray-800">
+          Cancelar
+        </button>
+        <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+          Crear Proyecto
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  // Funciones base (loadUserInfo, logout, etc.)
+  function showNewProjectModal() {
+    document.getElementById('newProjectModal').classList.remove('hidden');
+  }
+
+  function hideNewProjectModal() {
+    document.getElementById('newProjectModal').classList.add('hidden');
+  }
+
+  function loadUserInfo() {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      window.location.href = 'iniciosesion.html';
+      return;
+    }
+
+    fetch('http://localhost:8862/api/users/current', {
+      headers: {
+        'Authorization': 'Bearer ' + token
+      }
+    })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Error de autenticación');
+              }
+              return response.json();
+            })
+            .then(data => {
+              if (data && data.username) {
+                currentUsername = data.username;
+                document.getElementById('welcomeMessage').textContent = `¡Bienvenido, ${data.username}!`;
+              } else {
+                throw new Error('Respuesta inválida del servidor');
+              }
+            })
+            .catch(error => {
+              console.error('Error loading user info:', error);
+              localStorage.removeItem('token');
+            });
+  }
+
+  function logout() {
+    localStorage.removeItem('token');
+    window.location.href = 'iniciosesion.html';
+  }
+
+  function loadProjects() {
+    fetch('http://localhost:8862/api/projects', {
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('token')
+      }
+    })
+            .then(response => response.json())
+            .then(projects => {
+              const projectsList = document.getElementById('projectsList');
+              projectsList.innerHTML = '';
+
+              projects.forEach(project => {
+                const card = document.createElement('div');
+                card.className = 'card bg-white rounded-lg shadow hover:shadow-lg transition-shadow';
+
+                const dueDate = new Date(project.dueDate);
+                const isOverdue = !project.closed && dueDate < new Date();
+                const statusClass = project.closed ? 'bg-green-100 text-green-800' :
+                        (isOverdue ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800');
+                const statusText = project.closed ? 'Completado' :
+                        (isOverdue ? 'Atrasado' : 'Activo');
+
+                card.innerHTML = `
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="text-xl font-semibold text-gray-800">${project.name}</h3>
+                                <span class="px-3 py-1 rounded-full text-sm font-medium ${statusClass}">
+                                    ${statusText}
+                                </span>
+                            </div>
+                            <p class="text-gray-600 mb-4">${project.description}</p>
+                            <div class="flex justify-between items-center">
+                                <div class="text-sm text-gray-500">
+                                    <i class="far fa-calendar-alt mr-2"></i>
+                                    ${dueDate.toLocaleDateString('es-ES', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })}
+                                </div>
+                                <div class="flex space-x-2">
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                projectsList.appendChild(card);
+              });
+            })
+            .catch(error => {
+              console.error('Error loading projects:', error);
+              alert('Error al cargar los proyectos');
+            });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    loadUserInfo();
+    loadProjects();
+  });
+
+  document.getElementById('statusFilter').addEventListener('change', loadProjects);
+  document.getElementById('sortFilter').addEventListener('change', loadProjects);
+  document.getElementById('searchFilter').addEventListener('input', loadProjects);
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const currentPath = window.location.pathname;
+    const links = document.querySelectorAll('nav a');
+
+    links.forEach(link => {
+      if (link.href.includes(currentPath)) {
+        link.classList.add('active');
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
