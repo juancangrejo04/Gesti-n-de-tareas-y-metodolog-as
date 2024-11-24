@@ -2,7 +2,6 @@ package co.ucentral.gestor.tareas.metodologias.persistencia.repositorios;
 
 import co.ucentral.gestor.tareas.metodologias.persistencia.entidades.Task;
 import org.springframework.data.jpa.domain.Specification;
-
 import java.time.LocalDateTime;
 
 public class TaskSpecification {

@@ -1,18 +1,20 @@
 package co.ucentral.gestor.tareas.metodologias.servicios;
 
+import co.ucentral.gestor.tareas.metodologias.controladores.UnauthorizedException;
 import co.ucentral.gestor.tareas.metodologias.dto.TaskDTO;
 import co.ucentral.gestor.tareas.metodologias.dto.TaskResponseDTO;
 import co.ucentral.gestor.tareas.metodologias.mappers.TaskMapper;
 import co.ucentral.gestor.tareas.metodologias.persistencia.entidades.Project;
 import co.ucentral.gestor.tareas.metodologias.persistencia.entidades.Task;
 import co.ucentral.gestor.tareas.metodologias.persistencia.entidades.User;
+import co.ucentral.gestor.tareas.metodologias.persistencia.repositorios.ProjectRepository;
 import co.ucentral.gestor.tareas.metodologias.persistencia.repositorios.TaskRepository;
 import co.ucentral.gestor.tareas.metodologias.persistencia.repositorios.TaskSpecification;
 import co.ucentral.gestor.tareas.metodologias.persistencia.repositorios.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -26,24 +28,35 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
     private final TaskMapper taskMapper;
+    private final ProjectRepository projectRepository;
 
     @Autowired
     public TaskService(TaskRepository taskRepository,
                        UserRepository userRepository,
-                       TaskMapper taskMapper) {
+                       TaskMapper taskMapper, ProjectRepository projectRepository) {
         this.taskRepository = taskRepository;
         this.userRepository = userRepository;
         this.taskMapper = taskMapper;
+        this.projectRepository = projectRepository;
     }
 
     public TaskResponseDTO createTask(TaskDTO taskDTO, String username) {
+        if (taskDTO.getProjectId() == null) {
+            throw new IllegalArgumentException("El ID del proyecto es obligatorio");
+        }
+
+        Project project = projectRepository.findById(taskDTO.getProjectId())
+                .orElseThrow(() -> new IllegalArgumentException("Proyecto no encontrado con ID: " + taskDTO.getProjectId()));
+
         Task task = taskMapper.toEntity(taskDTO);
+        task.setProject(project);
         task.setCreationDate(LocalDateTime.now());
         task.setAssignedUsers(getAssignedUsers(taskDTO.getAssignedUserIds()));
 
         Task savedTask = taskRepository.save(task);
         return taskMapper.toResponseDTO(savedTask);
     }
+
 
     public TaskResponseDTO updateTask(Long id, TaskDTO taskDTO, String username) {
         Task task = taskRepository.findById(id)
@@ -59,11 +72,16 @@ public class TaskService {
     }
 
     public void deleteTask(Long id, String username) {
-        Task task = taskRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Task not found"));
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        if (!task.isClosed()) {
-            throw new IllegalArgumentException("Cannot delete active task");
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Tarea no encontrada"));
+
+        if (!task.getProject().getCreator().equals(user) &&
+                !task.getAssignedUsers().contains(user) &&
+                !user.isAdmin()) {
+            throw new UnauthorizedException("No tiene permisos para eliminar esta tarea");
         }
 
         taskRepository.deleteById(id);
@@ -92,7 +110,7 @@ public class TaskService {
                 .collect(Collectors.toList());
     }
 
-    public List<TaskResponseDTO> getProjectTasks(Project projectId) {
+    public List<TaskResponseDTO> getProjectTasks(Long projectId) {
         if (projectId == null) {
             throw new IllegalArgumentException("Project ID cannot be null");
         }
@@ -121,4 +139,35 @@ public class TaskService {
             throw new IllegalArgumentException("Invalid date format: " + date, e);
         }
     }
+
+    public TaskResponseDTO updateTaskStatus(Long id, Boolean closed, String username) {
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Task not found"));
+        if (!task.getAssignedUsers().stream()
+                .anyMatch(user -> user.getUsername().equals(username)) && !task.getProject().getCreator().getUsername().equals(username)) {
+            throw new IllegalArgumentException("User not authorized to update task status");
+        }
+        task.setClosed(closed);
+        Task updatedTask = taskRepository.save(task);
+
+        return taskMapper.toResponseDTO(updatedTask);
+    }
+
+    public TaskResponseDTO getTask(Long id, String username) {
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Task not found"));
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        if (!task.getProject().getCreator().equals(user) &&
+                !task.getAssignedUsers().contains(user) &&
+                !user.isAdmin()) {
+            throw new UnauthorizedException("No tiene permisos para ver esta tarea");
+        }
+
+        return taskMapper.toResponseDTO(task);
+    }
+
+
 }

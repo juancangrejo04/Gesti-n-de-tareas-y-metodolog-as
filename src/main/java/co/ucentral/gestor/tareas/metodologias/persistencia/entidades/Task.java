@@ -1,15 +1,20 @@
 package co.ucentral.gestor.tareas.metodologias.persistencia.entidades;
 
 import jakarta.persistence.*;
-import lombok.Data;
-
+import lombok.Getter;
+import lombok.Setter;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
+@Setter
 @Entity
-@Data
 @Table(name = "tasks")
+@ToString(exclude = {"project", "assignedUsers"})
+@EqualsAndHashCode(of = "id")
 public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,14 +36,14 @@ public class Task {
     private boolean closed;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "projects_id")
+    @JoinColumn(name = "project_id")
     private Project project;
 
     @ManyToMany
     @JoinTable(
             name = "task_assigned_users",
             joinColumns = @JoinColumn(name = "tasks_id"),
-            inverseJoinColumns = @JoinColumn(name = "users_id")
+            inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private List<User> assignedUsers = new ArrayList<>();
 

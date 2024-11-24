@@ -23,4 +23,5 @@ public class UserDTO {
     private String fullName;
 
     private String phoneNumber;
+    private boolean isAdmin;
 }

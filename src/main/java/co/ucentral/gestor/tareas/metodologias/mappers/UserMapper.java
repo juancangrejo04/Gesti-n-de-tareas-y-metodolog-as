@@ -15,6 +15,7 @@ public class UserMapper {
         user.setPassword(dto.getPassword());
         user.setFullName(dto.getFullName());
         user.setPhoneNumber(dto.getPhoneNumber());
+        user.isAdmin();
         return user;
     }
 

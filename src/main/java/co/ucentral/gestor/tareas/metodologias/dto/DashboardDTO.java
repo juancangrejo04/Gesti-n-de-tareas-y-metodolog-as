@@ -6,8 +6,10 @@ import java.util.List;
 
 @Data
 public class DashboardDTO {
-    private UserResponseDTO user;
-    private List<ProjectResponseDTO> pendingProjects;
-    private List<TaskResponseDTO> pendingTasks;
-    private ProjectStatisticsDTO statistics;
+    private int totalProjects;
+    private int completedProjects;
+    private int pendingProjects;
+    private int overdueProjects;
+    private List<ProjectResponseDTO> projects;
+    private List<TaskResponseDTO> tasks;
 }

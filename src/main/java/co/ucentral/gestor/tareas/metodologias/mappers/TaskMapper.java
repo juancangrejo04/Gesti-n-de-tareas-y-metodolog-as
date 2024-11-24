@@ -4,9 +4,8 @@ import co.ucentral.gestor.tareas.metodologias.dto.TaskDTO;
 import co.ucentral.gestor.tareas.metodologias.dto.TaskResponseDTO;
 import co.ucentral.gestor.tareas.metodologias.persistencia.entidades.Project;
 import co.ucentral.gestor.tareas.metodologias.persistencia.entidades.Task;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import java.util.stream.Collectors;
 
 @Component
@@ -44,6 +43,7 @@ public class TaskMapper {
         dto.setCreationDate(task.getCreationDate());
         dto.setDueDate(task.getDueDate());
         dto.setClosed(task.isClosed());
+
 
 
         if (task.getProject() != null) {

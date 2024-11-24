@@ -29,34 +29,7 @@ public class DashboardService {
     private final ProjectMapper projectMapper;
     private final TaskMapper taskMapper;
 
-    public DashboardDTO getDashboardData(String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        DashboardDTO dashboard = new DashboardDTO();
-        dashboard.setUser(new UserResponseDTO(
-                user.getId(),
-                user.getEmail(),
-                user.getUsername(),
-                user.getFullName(),
-                user.getPhoneNumber(),
-                user.isAdmin()
-        ));
-
-        List<Project> pendingProjects = projectRepository.findByCreatorAndClosedFalse(user);
-        dashboard.setPendingProjects(pendingProjects.stream()
-                .map(projectMapper::toResponseDTO)
-                .collect(Collectors.toList()));
-
-        List<Task> pendingTasks = taskRepository.findByAssignedUsersContainingAndClosedFalse(user);
-        dashboard.setPendingTasks(pendingTasks.stream()
-                .map(taskMapper::toResponseDTO)
-                .collect(Collectors.toList()));
-
-        dashboard.setStatistics(calculateStatistics(user));
-
-        return dashboard;
-    }
 
     private ProjectStatisticsDTO calculateStatistics(User user) {
         List<Project> allProjects = projectRepository.findByCreatorOrAssignedUsersContaining(user, user);
@@ -76,5 +49,36 @@ public class DashboardService {
         }
 
         return stats;
+    }
+
+    public DashboardDTO getDashboardData(String username) {
+        DashboardDTO dashboardDTO = new DashboardDTO();
+
+        List<Project> allProjects = projectRepository.findByCreatorUsername(username);
+        List<Project> pendingProjects = allProjects.stream()
+                .filter(p -> !p.isClosed())
+                .collect(Collectors.toList());
+        List<Project> completedProjects = allProjects.stream()
+                .filter(Project::isClosed)
+                .collect(Collectors.toList());
+        List<Project> overdueProjects = allProjects.stream()
+                .filter(p -> !p.isClosed() && p.getDueDate().isBefore(LocalDateTime.now()))
+                .collect(Collectors.toList());
+
+        dashboardDTO.setTotalProjects(allProjects.size());
+        dashboardDTO.setCompletedProjects(completedProjects.size());
+        dashboardDTO.setPendingProjects(pendingProjects.size());
+        dashboardDTO.setOverdueProjects(overdueProjects.size());
+
+        dashboardDTO.setProjects(pendingProjects.stream()
+                .map(projectMapper::toResponseDTO)
+                .collect(Collectors.toList()));
+
+        List<Task> pendingTasks = taskRepository.findPendingTasksByUsername(username);
+        dashboardDTO.setTasks(pendingTasks.stream()
+                .map(taskMapper::toResponseDTO)
+                .collect(Collectors.toList()));
+
+        return dashboardDTO;
     }
 }

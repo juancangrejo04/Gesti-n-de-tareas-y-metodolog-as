@@ -11,7 +11,6 @@ public class UserResponseDTO {
     private String phoneNumber;
     private boolean isAdmin;
 
-    // Constructor
     public UserResponseDTO(Long id, String email, String username, String fullName, String phoneNumber, boolean isAdmin) {
         this.id = id;
         this.email = email;

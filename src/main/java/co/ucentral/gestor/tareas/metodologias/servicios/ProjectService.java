@@ -62,25 +62,13 @@ public class ProjectService {
     public void deleteProject(Long id, String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-
         Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Proyecto no encontrado"));
-
-        if (!canDeleteProject(project, user)) {
-            throw new UnauthorizedException("No tiene permisos para eliminar este proyecto");
-        }
-
         if (hasPendingTasks(project) && !user.isAdmin()) {
             throw new InvalidOperationException(
                     "No se puede eliminar el proyecto porque tiene tareas pendientes");
         }
-
         projectRepository.delete(project);
-    }
-
-    private boolean canDeleteProject(Project project, User user) {
-        return user.isAdmin() ||
-                (project.getCreator().equals(user) && project.isClosed());
     }
 
     private boolean hasPendingTasks(Project project) {
@@ -114,5 +102,39 @@ public class ProjectService {
                 .map(projectMapper::toResponseDTO)
                 .collect(Collectors.toList()));
         return column;
+    }
+
+    public void updateProjectStatus(Long projectId, boolean closed, String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new RuntimeException("Proyecto no encontrado"));
+
+        if (!project.getCreator().equals(user) && !user.isAdmin()) {
+            throw new UnauthorizedException("No tiene permisos para actualizar este proyecto");
+        }
+
+        project.setClosed(closed);
+        projectRepository.save(project);
+    }
+
+    public ProjectResponseDTO updateProject(Long id, ProjectDTO projectDTO, String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        Project project = projectRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Proyecto no encontrado"));
+
+        if (!project.getCreator().equals(user) && !user.isAdmin()) {
+            throw new UnauthorizedException("No tiene permisos para actualizar este proyecto");
+        }
+
+        project.setName(projectDTO.getName());
+        project.setDescription(projectDTO.getDescription());
+        project.setDueDate(projectDTO.getDueDate());
+
+        Project updatedProject = projectRepository.save(project);
+        return projectMapper.toResponseDTO(updatedProject);
     }
 }
